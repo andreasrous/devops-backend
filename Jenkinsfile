@@ -45,6 +45,7 @@ pipeline {
                     export ANSIBLE_CONFIG=~/workspace/ansible/ansible.cfg
                     ansible-playbook -i ~/workspace/ansible/hosts.yaml \
                         -l appserver-vm -e db_server_url=localhost \
+                        -e deploy_nginx=false \
                         ~/workspace/ansible/playbooks/spring.yaml
                 '''
             }
