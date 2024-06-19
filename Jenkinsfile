@@ -4,7 +4,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'git@github.com:andreasrous/devops-backend.git'
+                git branch: 'main',
+                    url: 'git@github.com:andreasrous/devops-backend.git'
             }
         }
 
@@ -32,7 +33,8 @@ pipeline {
             steps {
                 sh '''
                     export ANSIBLE_CONFIG=~/workspace/ansible/ansible.cfg
-                    ansible-playbook -i ~/workspace/ansible/hosts.yaml -l dbserver-vm ~/workspace/ansible/playbooks/postgres.yaml
+                    ansible-playbook -i ~/workspace/ansible/hosts.yaml \
+                        -l dbserver-vm ~/workspace/ansible/playbooks/postgres.yaml
                 '''
             }
         }
@@ -40,9 +42,10 @@ pipeline {
         stage('Deploy spring boot app') {
             steps {
                 sh '''
-                    # edit host var for appserver
                     export ANSIBLE_CONFIG=~/workspace/ansible/ansible.cfg
-                    ansible-playbook -i ~/workspace/ansible/hosts.yaml -l appserver-vm -e db_server_url=localhost ~/workspace/ansible/playbooks/spring.yaml
+                    ansible-playbook -i ~/workspace/ansible/hosts.yaml \
+                        -l appserver-vm -e db_server_url=localhost \
+                        ~/workspace/ansible/playbooks/spring.yaml
                 '''
             }
         }
@@ -51,7 +54,11 @@ pipeline {
             steps {
                 sh '''
                     export ANSIBLE_CONFIG=~/workspace/ansible/ansible.cfg
-                    ansible-playbook -i ~/workspace/ansible/hosts.yaml -l frontserver-vm -e branch=main -e backend_server_url=http://localhost:9090 ~/workspace/ansible/playbooks/vuejs.yaml
+                    ansible-playbook -i ~/workspace/ansible/hosts.yaml \
+                        -l frontserver-vm -e branch=main \
+                        -e backend_server_url=http://localhost:9090 \
+                        -e '{"app": {"VITE_BACKEND": "http://192.168.56.104"}}' \
+                        ~/workspace/ansible/playbooks/vuejs.yaml
                 '''
             }
         }
